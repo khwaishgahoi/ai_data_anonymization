@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Anonymizer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      text-align: center;
+      width: 400px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+
+    input[type="file"],
+    select {
+      margin: 15px 0;
+      border: none;
+      background: white;
+      color: #000;
+      border-radius: 5px;
+      padding: 10px;
+      width: 100%;
+    }
+
+    button {
+      background-color: #00c6ff;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #007acc;
+    }
+
+    a#downloadLink {
+      display: none;
+      margin-top: 20px;
+      color: #00ffcc;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Data Anonymizer</h1>
+    <input type="file" id="fileInput" accept=".csv,.txt,.pdf,.docx,.xlsx">
+
+    <select id="formatSelect">
+      <option value=".csv">CSV</option>
+      <option value=".xlsx">Excel</option>
+      <option value=".txt">Text</option>
+      <option value=".docx">Word</option>
+    </select>
+
+    <button onclick="uploadFile()">Anonymize</button>
+    <br>
+    <a id="downloadLink" href="#" download>⬇️ Download Anonymized File</a>
+  </div>
+
+  <script>
+    async function uploadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const formatSelect = document.getElementById('formatSelect');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Please select a file to anonymize.");
+        return;
+      }
+
+      const selectedFormat = formatSelect.value;
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('output_format', selectedFormat);
+
+      const response = await fetch('http://localhost:5000/anonymize', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const downloadLink = document.getElementById('downloadLink');
+
+        const baseName = file.name.split('.').slice(0, -1).join('.');
+        downloadLink.href = url;
+        downloadLink.download = `anonymized_${baseName}${selectedFormat}`;
+        downloadLink.style.display = 'inline';
+        downloadLink.textContent = '⬇️ Download Anonymized File';
+      } else {
+        alert("An error occurred during anonymization.");
+      }
+    }
+  </script>
+</body>
+</html>
