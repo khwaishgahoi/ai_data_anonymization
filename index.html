@@ -99,7 +99,7 @@
       formData.append('file', file);
       formData.append('output_format', selectedFormat);
 
-      const response = await fetch('http://localhost:5000/anonymize', {
+      const response = await fetch('https://your-render-url.onrender.com/anonymize', {
         method: 'POST',
         body: formData
       });
