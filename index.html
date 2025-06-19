@@ -1,68 +1,138 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Data Anonymizer</title>
+  <title>AI Data Anonymizer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #80deea);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #006064;
+      margin-bottom: 20px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    form {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      animation: slideUp 1s ease-out;
+    }
+
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    button {
+      background-color: #00796b;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #004d40;
+    }
+
+    #downloadLink {
+      margin-top: 20px;
+      display: none;
+      font-weight: bold;
+      color: #004d40;
+      text-decoration: none;
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <h1>Upload File for Anonymization</h1>
-    <form id="uploadForm">
-        <input type="file" name="file" id="file" required />
-        <label for="format">Select output format:</label>
-        <select name="output_format" id="output_format">
-            <option value=".csv">CSV</option>
-            <option value=".xlsx">Excel</option>
-            <option value=".txt">Text</option>
-            <option value=".docx">DOCX</option>
-        </select>
-        <button type="submit">Anonymize</button>
-    </form>
 
-   <script>
-  async function uploadFile() {
-    const fileInput = document.getElementById('fileInput');
-    const formatSelect = document.getElementById('formatSelect');
-    const downloadLink = document.getElementById('downloadLink');
+  <h1>🔐 AI Data Anonymizer</h1>
 
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("Please select a file to anonymize.");
-      return;
-    }
+  <form id="uploadForm" onsubmit="event.preventDefault(); uploadFile();">
+    <input type="file" id="fileInput" required />
+    <label for="formatSelect">Select output format:</label>
+    <select id="formatSelect">
+      <option value=".csv">CSV</option>
+      <option value=".xlsx">Excel</option>
+      <option value=".txt">Text</option>
+      <option value=".docx">DOCX</option>
+    </select>
+    <button type="submit">🚀 Anonymize</button>
+  </form>
 
-    // Show a loading message
-    downloadLink.style.display = 'inline';
-    downloadLink.textContent = '⏳ Anonymizing... Please wait...';
-    downloadLink.href = '#';
-    downloadLink.removeAttribute('download');
+  <a id="downloadLink" href="#" download></a>
 
-    const selectedFormat = formatSelect.value;
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('output_format', selectedFormat);
+  <script>
+    async function uploadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const formatSelect = document.getElementById('formatSelect');
+      const downloadLink = document.getElementById('downloadLink');
 
-    try {
-      const response = await fetch('/anonymize', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const baseName = file.name.split('.').slice(0, -1).join('.');
-        downloadLink.href = url;
-        downloadLink.download = `anonymized_${baseName}${selectedFormat}`;
-        downloadLink.textContent = '⬇️ Download Anonymized File';
-      } else {
-        downloadLink.style.display = 'none';
-        alert("An error occurred during anonymization.");
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Please select a file to anonymize.");
+        return;
       }
-    } catch (error) {
-      downloadLink.style.display = 'none';
-      alert("An unexpected error occurred.");
+
+      // Show loading message
+      downloadLink.style.display = 'inline';
+      downloadLink.textContent = '⏳ Anonymizing... Please wait...';
+      downloadLink.href = '#';
+      downloadLink.removeAttribute('download');
+
+      const selectedFormat = formatSelect.value;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('output_format', selectedFormat);
+
+      try {
+        const response = await fetch('/anonymize', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const baseName = file.name.split('.').slice(0, -1).join('.');
+          downloadLink.href = url;
+          downloadLink.download = `anonymized_${baseName}${selectedFormat}`;
+          downloadLink.textContent = '⬇️ Download Anonymized File';
+        } else {
+          downloadLink.style.display = 'none';
+          alert("❌ An error occurred during anonymization.");
+        }
+      } catch (error) {
+        downloadLink.style.display = 'none';
+        alert("❌ An unexpected error occurred.");
+      }
     }
-  }
-</script>
+  </script>
 
 </body>
 </html>
