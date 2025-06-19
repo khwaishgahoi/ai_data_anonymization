@@ -39,12 +39,17 @@ def randomize_email(email):
         return ''.join(random.choices(string.ascii_lowercase, k=len(local))) + '@' + domain
     return email
 
+EMAIL_RE = re.compile(r'\b[\w.-]+@[\w.-]+\.\w+\b')
+PHONE_RE = re.compile(r'\b\d{10,}\b')
+NAME_RE = re.compile(r'\b(?:Mr|Mrs|Ms|Dr)\.?\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b')
+
 def anonymize_text(text):
     text = str(text)
-    text = re.sub(r'\b[\w.-]+@[\w.-]+\.\w+\b', lambda m: randomize_email(m.group()), text)
-    text = re.sub(r'\b\d{10,}\b', lambda m: randomize_phone(m.group()), text)
-    text = re.sub(r'\b(?:Mr|Mrs|Ms|Dr)\.?\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b', lambda m: randomize_string(m.group()), text)
+    text = EMAIL_RE.sub(lambda m: randomize_email(m.group()), text)
+    text = PHONE_RE.sub(lambda m: randomize_phone(m.group()), text)
+    text = NAME_RE.sub(lambda m: randomize_string(m.group()), text)
     return text
+
 
 def anonymize_dataframe(df):
     df = df.copy()
