@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: ai-data-anonymizer
+    env: python
+    pythonVersion: 3.10
+    buildCommand: |
+      python -m pip install --upgrade pip setuptools==68.0.0 wheel
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app

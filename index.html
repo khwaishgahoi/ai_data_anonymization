@@ -30,8 +30,9 @@
       margin-bottom: 25px;
     }
 
-    input[type="file"] {
-      margin: 20px 0;
+    input[type="file"],
+    select {
+      margin: 15px 0;
       border: none;
       background: white;
       color: #000;
@@ -68,6 +69,14 @@
   <div class="container">
     <h1>🔐 Data Anonymizer</h1>
     <input type="file" id="fileInput" accept=".csv,.txt,.pdf,.docx,.xlsx">
+
+    <select id="formatSelect">
+      <option value=".csv">CSV</option>
+      <option value=".xlsx">Excel</option>
+      <option value=".txt">Text</option>
+      <option value=".docx">Word</option>
+    </select>
+
     <button onclick="uploadFile()">Anonymize</button>
     <br>
     <a id="downloadLink" href="#" download>⬇️ Download Anonymized File</a>
@@ -76,6 +85,7 @@
   <script>
     async function uploadFile() {
       const fileInput = document.getElementById('fileInput');
+      const formatSelect = document.getElementById('formatSelect');
       const file = fileInput.files[0];
 
       if (!file) {
@@ -83,8 +93,11 @@
         return;
       }
 
+      const selectedFormat = formatSelect.value;
+
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('output_format', selectedFormat);
 
       const response = await fetch('http://localhost:5000/anonymize', {
         method: 'POST',
@@ -95,8 +108,10 @@
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const downloadLink = document.getElementById('downloadLink');
+
+        const baseName = file.name.split('.').slice(0, -1).join('.');
         downloadLink.href = url;
-        downloadLink.download = `anonymized_${file.name}`;
+        downloadLink.download = `anonymized_${baseName}${selectedFormat}`;
         downloadLink.style.display = 'inline';
         downloadLink.textContent = '⬇️ Download Anonymized File';
       } else {
