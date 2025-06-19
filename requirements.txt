@@ -6,4 +6,6 @@ PyMuPDF==1.23.19
 gunicorn==21.2.0
 numpy==1.26.4
 flask-cors
+Werkzeug
+openpyxl
 scikit-learn==1.5.0
