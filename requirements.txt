@@ -5,4 +5,5 @@ pdfplumber==0.10.3
 PyMuPDF==1.23.19
 gunicorn==21.2.0
 numpy==1.26.4
+flask-cors
 scikit-learn==1.5.0
