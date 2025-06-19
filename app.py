@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import os
 import pandas as pd
 import random
@@ -139,7 +139,7 @@ def anonymize_file():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-=======
+
 import os
 import pandas as pd
 import random
