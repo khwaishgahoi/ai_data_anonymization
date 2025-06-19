@@ -280,4 +280,3 @@ def anonymize_file():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
->>>>>>> 081550469f45cfe845762c12e90e2dd7f3d1bd52
