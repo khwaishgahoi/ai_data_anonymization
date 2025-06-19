@@ -17,48 +17,52 @@
         <button type="submit">Anonymize</button>
     </form>
 
-    <script>
-        const form = document.getElementById('uploadForm');
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
+   <script>
+  async function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const formatSelect = document.getElementById('formatSelect');
+    const downloadLink = document.getElementById('downloadLink');
 
-            const fileInput = document.getElementById('file');
-            const format = document.getElementById('output_format').value;
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select a file to anonymize.");
+      return;
+    }
 
-            if (!fileInput.files.length) {
-                alert("Please select a file first.");
-                return;
-            }
+    // Show a loading message
+    downloadLink.style.display = 'inline';
+    downloadLink.textContent = '⏳ Anonymizing... Please wait...';
+    downloadLink.href = '#';
+    downloadLink.removeAttribute('download');
 
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
-            formData.append("output_format", format);
+    const selectedFormat = formatSelect.value;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('output_format', selectedFormat);
 
-            try {
-                const response = await fetch("/anonymize", {
-                    method: "POST",
-                    body: formData,
-                });
+    try {
+      const response = await fetch('/anonymize', {
+        method: 'POST',
+        body: formData
+      });
 
-                if (!response.ok) {
-                    const err = await response.json();
-                    alert("Error: " + err.error);
-                    return;
-                }
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const baseName = file.name.split('.').slice(0, -1).join('.');
+        downloadLink.href = url;
+        downloadLink.download = `anonymized_${baseName}${selectedFormat}`;
+        downloadLink.textContent = '⬇️ Download Anonymized File';
+      } else {
+        downloadLink.style.display = 'none';
+        alert("An error occurred during anonymization.");
+      }
+    } catch (error) {
+      downloadLink.style.display = 'none';
+      alert("An unexpected error occurred.");
+    }
+  }
+</script>
 
-                const blob = await response.blob();
-                const downloadUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = downloadUrl;
-                a.download = "anonymized_output" + format;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            } catch (err) {
-                console.error(err);
-                alert("Something went wrong while sending the request.");
-            }
-        });
-    </script>
 </body>
 </html>
